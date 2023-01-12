@@ -14,7 +14,7 @@ const Post = ({ post }) => {
         <h3>{title}</h3>
         <p className="fecha">{formatearFecha(publishedAt)}</p>
         <p className="resumen">{content}</p>
-        <Link className="enlace" to={`/posts/${url}`}>Leer entrada</Link>
+        <Link className="enlace" to={`/blog/${url}`}>Leer entrada</Link>
       </div>
     </article>
   );

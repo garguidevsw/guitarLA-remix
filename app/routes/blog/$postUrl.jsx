@@ -1,7 +1,6 @@
 import { useLoaderData } from "@remix-run/react";
 import { obtenerPost } from "~/models/posts.server";
 import { formatearFecha } from "~/utils/helpers";
-import styles from '~/styles/blog.css'
 
 
 export function meta({data}) {
@@ -16,15 +15,6 @@ export function meta({data}) {
         title: `GuitarLA - ${ data.data[0].attributes.title }`,
         description: `Guitarras, blog - ${ data.data[0].attributes.title }`
     }
-}
-
-export function links() {
-    return [
-        {
-            rel: 'stylesheet',
-            href: styles
-        }
-    ]
 }
 
 export async function loader({ params }) {
@@ -45,7 +35,7 @@ const Post = () => {
   const { title, content, image, publishedAt } = post?.data[0].attributes;
 
   return (
-    <article className="contenedor post mt-3">
+    <article className="post mt-3">
       <img
         className="imagen"
         src={image.data.attributes.url}
