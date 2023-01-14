@@ -1,100 +1,155 @@
+import { useEffect, useState } from "react";
 import {
-    Meta,
-    Links,
-    Outlet,
-    Scripts,
-    LiveReload,
-    useCatch,
-    Link
-} from '@remix-run/react'
+  Meta,
+  Links,
+  Outlet,
+  Scripts,
+  LiveReload,
+  useCatch,
+  Link,
+} from "@remix-run/react";
 
-import Header from '~/components/header'
-import Footer from '~/components/footer'
+import Header from "~/components/header";
+import Footer from "~/components/footer";
 
-import styles from '~/styles/index.css'
+import styles from "~/styles/index.css";
 
 export function meta() {
-    return (
-        {
-            charset: 'utf-8',
-            title: 'GuitarLA - Remix',
-            viewport: 'width=device-with,initial-scale=1'
-        }
-    )
+  return {
+    charset: "utf-8",
+    title: "GuitarLA - Remix",
+    viewport: "width=device-with,initial-scale=1",
+  };
 }
 
 export function links() {
-    return [
-        {
-            rel: 'stylesheet',
-            href: 'https://necolas.github.io/normalize.css/8.0.1/normalize.css'
-        },
-        {
-            rel: 'preconnect',
-            href: 'https://fonts.googleapis.com'
-        },
-        {
-            rel: 'preconnect',
-            href: 'https://fonts.gstatic.com',
-            crossOrigin: 'true'
-        },
-        {
-            rel: 'stylesheet',
-            href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap'
-        },
-        {
-            rel: 'stylesheet',
-            href: styles
-        },
-    ]
+  return [
+    {
+      rel: "stylesheet",
+      href: "https://necolas.github.io/normalize.css/8.0.1/normalize.css",
+    },
+    {
+      rel: "preconnect",
+      href: "https://fonts.googleapis.com",
+    },
+    {
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossOrigin: "true",
+    },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap",
+    },
+    {
+      rel: "stylesheet",
+      href: styles,
+    },
+  ];
 }
 
 export default function App() {
-    return (
-        <Document>
-            <Outlet />
-        </Document>
-    )
+  const carritoLS = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem("carrito")) ?? [] : null;
+  const [carrito, setCarrito] = useState(carritoLS);
+
+  useEffect(() => {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }, [carrito]);
+
+  const agregarCarrito = (guitarra) => {
+    if (carrito.some((guitarraState) => guitarraState.id === guitarra.id)) {
+      const newCarrito = carrito.map((item) => {
+        if (item.id == guitarra.id) {
+          item.quantity = item.quantity + guitarra.quantity;
+        }
+
+        return item;
+      });
+
+      setCarrito(newCarrito);
+    } else {
+      setCarrito([...carrito, guitarra]);
+    }
+  };
+
+  const updateQuantity = (guitarra) => {
+    const newCarrito = carrito.map((item) => {
+      if (item.id === guitarra.id) {
+        item.quantity = guitarra.qty;
+      }
+
+      return item;
+    });
+
+    setCarrito(newCarrito);
+  };
+
+  const deleteGuitarra = (id) => {
+    const newCarrito = carrito.filter((item) => item.id !== id);
+
+    setCarrito(newCarrito);
+  };
+
+  return (
+    <Document>
+      <Outlet
+        context={{
+          agregarCarrito,
+          carrito,
+          updateQuantity,
+          deleteGuitarra,
+        }}
+      />
+    </Document>
+  );
 }
 
 function Document({ children }) {
-    return (
-        <html lang="es">
-            <head>
-                <Meta />
-                <Links />
-            </head>
+  return (
+    <html lang="es">
+      <head>
+        <Meta />
+        <Links />
+      </head>
 
-            <body>
-                <Header />
-                { children }
+      <body>
+        <Header />
+        {children}
 
-                <Footer />
+        <Footer />
 
-                <Scripts />
-                <LiveReload />
-            </body>
-        </html>
-    )
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
+  );
 }
 
 // Manejo de errores
 export function CatchBoundary() {
-    const error = useCatch()
+  const error = useCatch();
 
-    return (
-        <Document>
-            <p className='error'>{error.status} { error.statusText}</p>
-            <Link className='error-enlace' to="/">Regresar a la página principal</Link>
-        </Document>
-    )
+  return (
+    <Document>
+      <p className="error">
+        {error.status} {error.statusText}
+      </p>
+      <Link className="error-enlace" to="/">
+        Regresar a la página principal
+      </Link>
+    </Document>
+  );
 }
 
-export function ErrorBoundary({error}) {
-    return (
-        <Document>
-            <p className='error'>{error.status} { error.statusText}</p>
-            <Link className='error-enlace' to="/">Regresar a la página principal</Link>
-        </Document>
-    )
+export function ErrorBoundary({ error }) {
+  return (
+    <Document>
+      <p className="error">
+        {error.status} {error.statusText}
+      </p>
+      <Link className="error-enlace" to="/">
+        Regresar a la página principal
+      </Link>
+    </Document>
+  );
 }
